@@ -101,7 +101,7 @@ public abstract class Snake extends GameElement implements Serializable{
 
 			System.out.println("eu, snake nº " + id + " , vou ver se a célula " + cellIWant.getPosition().toString() + " está empty");
 
-			if(!cellIWant.isOcupied()) {
+			if(!cellIWant.isOccupied()) {
 				try {
 					cellIWant.request(this);
 					addCell(cellIWant);

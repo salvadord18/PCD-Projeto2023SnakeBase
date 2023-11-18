@@ -18,7 +18,7 @@ import game.AutomaticSnake;
  */
 public class Cell {
 	private BoardPosition position;
-	private Snake ocuppyingSnake = null;
+	private Snake occupyingSnake = null;
 	private GameElement gameElement = null;
 	private Lock lock;
 
@@ -42,9 +42,7 @@ public class Cell {
 	public void request(Snake snake)
 			throws InterruptedException {
 		lock.lock();
-
 		//TODO coordination and mutual exclusion
-
 		//TODO NAO ESQUECER QUE QUANDO AS SNAKES SE MOVEREM, TÊM DE SER RETIRADAS DA CELL!
 	}
 
@@ -55,44 +53,48 @@ public class Cell {
 	}
 
 	//Boolean que diz se é snake o GameElement da célula
-	public boolean isOcupiedBySnake() {
-		return ocuppyingSnake != null;
+	public boolean isOccupiedBySnake() {
+		return occupyingSnake != null;
 	}
 
 	//Atribui o GameElement à célula - a ser usado sempre 
-	public  void setGameElement(GameElement element) {
+	public void setGameElement(GameElement element) {
 		// TODO coordination and mutual exclusion
-		if(isOcupiedByGoal() && element instanceof Snake) {
+		if(isOccupiedByGoal() && element instanceof Snake) {
 			((Snake)element).setDesiredSize(getGoal().getValue());
 			getGoal().captureGoal();
+			gameElement = element;
 		}
-		if(element instanceof Snake)
-			ocuppyingSnake = (Snake)element;
-		gameElement=element;
+		if(element instanceof Snake) {
+			occupyingSnake = (Snake)element;
+			gameElement = element;
+		}
+		gameElement = element;
 	}
 
 	//Se está ocupada
-	public boolean isOcupied() {
-		return isOcupiedBySnake() || (gameElement != null && gameElement instanceof Obstacle);
+	public boolean isOccupied() {
+		return isOccupiedBySnake() || (gameElement != null && gameElement instanceof Obstacle);
 	}
 
 	//Que snake está na célula (PODE DEVOLVER NULL)
-	public Snake getOcuppyingSnake() {
-		return ocuppyingSnake;
+	public Snake getOccupyingSnake() {
+		return occupyingSnake;
 	}
 
 
-	public  Goal removeGoal() {
+	public Goal removeGoal() {
 		// TODO
 		return null;
 	}
 	public void removeObstacle() {
-		//TODO
+		if(gameElement instanceof Obstacle)
+			gameElement = null;
 	}
 
 	//nada
 	public void removeSnake() {
-		ocuppyingSnake = null;
+		occupyingSnake = null;
 		gameElement = null;
 	}
 
@@ -102,10 +104,7 @@ public class Cell {
 	}
 
 
-	public boolean isOcupiedByGoal() {
+	public boolean isOccupiedByGoal() {
 		return (gameElement!=null && gameElement instanceof Goal);
 	}
-
-
-
 }
