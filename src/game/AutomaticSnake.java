@@ -56,7 +56,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 		//		}
 
 		//Lambda Expression ( :( ) que remove todas as posições que tenham como snake a própria
-		neighbors.removeIf(pos -> this.equals(getBoard().getCell(pos).getOcuppyingSnake()));
+		neighbors.removeIf(pos -> this.equals(getBoard().getCell(pos).getOccupyingSnake()));
 
 		if(neighbors.isEmpty())
 			Thread.currentThread().stop(); 		//porquê stop? porque ela já não terá mesmo para onde se mover.
@@ -77,7 +77,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 
 		Cell nova = super.getBoard().getCell(ParaOndeMeVouMover);
 
-		if(nova.isOcupied() && !nova.isOcupiedByGoal())
+		if(nova.isOccupied() && !nova.isOccupiedByGoal())
 			try {
 				wait();
 			} catch (InterruptedException e) {

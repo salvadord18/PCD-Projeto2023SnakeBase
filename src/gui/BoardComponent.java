@@ -68,9 +68,9 @@ public class BoardComponent extends JComponent implements KeyListener{
 						g.drawString(goal.getValue()+"", (int)Math.round((cell.getPosition().x+0.15)* CELL_WIDTH), 
 								(int)Math.round((cell.getPosition().y+0.9) * CELL_WIDTH));
 					}
-				if (cell.isOcupiedBySnake()) {
+				if (cell.isOccupiedBySnake()) {
 					// different color for human player...
-					if(cell.getOcuppyingSnake() instanceof HumanSnake)
+					if(cell.getOccupyingSnake() instanceof HumanSnake)
 						g.setColor(Color.ORANGE);
 					else
 						g.setColor(Color.LIGHT_GRAY);

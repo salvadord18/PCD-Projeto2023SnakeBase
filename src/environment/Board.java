@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import game.GameElement;
 import game.Goal;
@@ -22,6 +24,7 @@ public abstract class Board extends Observable {
 	protected LinkedList<Snake> snakes = new LinkedList<Snake>(); //todas as Snakes no Board
 	private LinkedList<Obstacle> obstacles= new LinkedList<Obstacle>(); //todos os Obstáculos no Board
 	protected boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
+	private ExecutorService ex = Executors.newFixedThreadPool(3); //onde implementar?
 
 	/*
 	 * Cells - mover cobras, mover obstaculos, ...
@@ -65,11 +68,14 @@ public abstract class Board extends Observable {
 		boolean placed=false;
 		while(!placed) {
 			BoardPosition pos=getRandomPosition();
-			if(!getCell(pos).isOcupied() && !getCell(pos).isOcupiedByGoal()) {
+			if(!getCell(pos).isOccupied() && !getCell(pos).isOccupiedByGoal()) {
 				getCell(pos).setGameElement(gameElement);
 				if(gameElement instanceof Goal) {
 					setGoalPosition(pos);
 					System.out.println("Goal placed at: " + pos + "! :D");
+				}
+				if(gameElement instanceof Obstacle) {
+					((Obstacle)gameElement).setCurrentCell(getCell(pos));
 				}
 				placed=true;
 			}
@@ -109,6 +115,9 @@ public abstract class Board extends Observable {
 			addGameElement(obs);
 			getObstacles().add(obs);
 			numberObstacles--;
+		}
+		for(Obstacle o : getObstacles()) {
+			o.run();
 		}
 	}
 
