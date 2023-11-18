@@ -20,10 +20,10 @@ public abstract class Board extends Observable {
 	public static final long REMOTE_REFRESH_INTERVAL = 100; //not necessary
 	public static final int NUM_COLUMNS = 10; //Largura do Board
 	public static final int NUM_ROWS = 10; //Comprimento do Board
-	public static final int MAXPOINTS = 10; //Condicao de término do jogo
+	public static final int MAXPOINTS = 3; //Condicao de término do jogo
 	protected LinkedList<Snake> snakes = new LinkedList<Snake>(); //todas as Snakes no Board
 	private LinkedList<Obstacle> obstacles= new LinkedList<Obstacle>(); //todos os Obstáculos no Board
-	protected boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
+	public boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
 	private ExecutorService ex = Executors.newFixedThreadPool(3); //onde implementar?
 
 	/*
@@ -41,6 +41,21 @@ public abstract class Board extends Observable {
 				cells[x][y] = new Cell(new BoardPosition(x, y));
 			}
 		}
+		Thread gameOver = new Thread() {
+			@Override 
+			public void run() {
+				while(!isFinished) {
+					
+				}
+				// interrompe as threads que correm os jogadores
+				for(Obstacle o : obstacles){
+					o.getObstacleMover().stop();
+				}
+				//isFinished = true;
+				System.err.println("GAME FINISHED!");
+			};
+		};
+		gameOver.start();
 	}
 
 	//Devolve a célula que se encontra na Board Position cellCoord
@@ -150,6 +165,10 @@ public abstract class Board extends Observable {
 	// Adiciona a snake ao vetor de snakes do Board
 	public void addSnake(Snake snake) {
 		snakes.add(snake);
+	}
+
+	public void finish() {
+		isFinished = true;
 	}
 
 

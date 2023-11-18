@@ -33,6 +33,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 			//getrandomcell
 			//request that cell
 		}
+		super.getBoard().finish();
 	}
 
 	public Thread SnakeThread () {

@@ -7,24 +7,19 @@ public Cell celulaOndeACobraSeVaiMover()
 	CellParaOndeMeVouMover = getNeighboringPositions(this (ou a célula onde estou)).get((int)(Math.random()*(possiblePositions.size()[-1 ou n?]))); 
 	return CellParaOndeMeVouMover;
 	
-Dúvida: Goal morre ou vai incrementando?
-
 
 Quando uma célula está ocupada e uma cobra se tenta mover para ela. a cobra fica AWAIT. (condition do lock)
 Quando uma cobra sai de uma célula, faz SEMPRE signall()
 
 
+----- Dúvidas ---------
+
+	1) Onde implementar a ThreadPool? É um executor?
+	2) Quem é que deve verificar se alguma das snakes já chegou ao prémio máximo?
+		Deverá ser a propria snake? 
 
 
-
-
-
-
-todo: botão RESET
-todo: ver se a posicao inicial da snake está a ser colocada como cheia EEE se está no path da cobra
-todo: cobra movimentar-se PARA O PRÉMIO.
-todo: implementar human snake
-
+-----------------------
 
 
 

@@ -38,10 +38,10 @@ public abstract class Snake extends GameElement implements Serializable{
 
 	//New Method
 	public void setDesiredSize(int value) {
-//		if(desired_size + value >= MAX_VALUE)
-//			desired_size = 9;
-//		else desired_size += value;
-//	}
+		//		if(desired_size + value >= MAX_VALUE)
+		//			desired_size = 9;
+		//		else desired_size += value;
+		//	}
 		desired_size += value;
 	}
 
