@@ -20,6 +20,8 @@ public abstract class Snake extends GameElement implements Serializable{
 	protected int desired_size;
 	private int id;
 	private Board board;
+//	private volatile boolean isMoving = true; // Flag para controlar o movimento
+
 	//private static int MAX_VALUE = 10
 
 	public Snake(int id,Board board) {
@@ -28,10 +30,11 @@ public abstract class Snake extends GameElement implements Serializable{
 		desired_size = size;
 	}
 
+	
 	public int getSize() {
 		return size;
 	}
-
+	
 	public void incrementSize() {
 		size++;
 	}
@@ -67,13 +70,13 @@ public abstract class Snake extends GameElement implements Serializable{
 	//New Method
 	public void removeCell() {
 		if(size == desired_size) {
-			cells.getFirst().removeSnake(); // dizer á celula q ja nao esta aliu nenhuma snake bro
+			cells.getFirst().removeGameElement(); // dizer á celula q ja nao esta aliu nenhuma snake bro
 			cells.removeFirst(); // remover a celula da lista de celulas da snake, dizer á snake q aquele celula ja n lhe pertence
 		}
 		else size++;
 	}
 
-	protected void move(Cell cell) throws InterruptedException {
+	protected void move() throws InterruptedException {
 		// TODO
 	}
 
@@ -118,6 +121,23 @@ public abstract class Snake extends GameElement implements Serializable{
 	public Board getBoard() {
 		return board;
 	}
+	 // Método para parar a movimentação da cobra
+//    public void stopMoving() {
+//        isMoving = false;
+//    }
 
+//    // Loop principal de execução da thread
+//    public void run() {
+//        while (isMoving) {
+//            try {
+//                move();
+//                // Aqui você pode ter um sleep ou algum controle de tempo
+//                // Thread.sleep(tempo);
+//            } catch (InterruptedException e) {
+//                // Tratamento de exceção ou re-interrupção da thread
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+//    }
 
 }

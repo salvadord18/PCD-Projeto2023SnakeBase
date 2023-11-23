@@ -21,7 +21,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 		doInitialPositioning();
 		System.err.println("initial size:" + cells.size());
 
-		while(super.size < Board.MAXPOINTS) {
+		while(true) { //mudar para !isFinished
 			try {
 				move();
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
@@ -33,7 +33,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 			//getrandomcell
 			//request that cell
 		}
-		super.getBoard().finish();
+		//super.getBoard().finish();
 	}
 
 	public Thread SnakeThread () {
@@ -41,10 +41,10 @@ public class AutomaticSnake extends Snake implements Runnable {
 	}
 
 	public synchronized void move() throws InterruptedException {
-		Cell currcell = super.getCells().getLast(); // vai buscar a célula atual
+		Cell currcell = super.getCells().getLast(); // vai buscar a célula da cabeça atual
 		if(currcell == null) return;
-		BoardPosition position = currcell.getPosition(); // vai buscar a posição atual da célula
-		System.out.println("Posição atual " + position + " do " + this.toString());
+		BoardPosition position = currcell.getPosition(); // vai buscar a posição atual dessa célula
+		System.out.println("Posição atual " + position + " da Snake " + this.getIdentification());
 
 		List<BoardPosition> neighbors = super.getBoard().getNeighboringPositions(currcell);
 
@@ -62,8 +62,9 @@ public class AutomaticSnake extends Snake implements Runnable {
 		if(neighbors.isEmpty())
 			Thread.currentThread().stop(); 		//porquê stop? porque ela já não terá mesmo para onde se mover.
 
-
-		/* linha que diferencia a AutomaticSnake da Human */
+		
+		
+		/* Escolher a célula mais perto do Goal de entre as vizinhas */
 		BoardPosition ParaOndeMeVouMover = null;
 		double min_distance = 9999.0; //random value
 
@@ -73,17 +74,18 @@ public class AutomaticSnake extends Snake implements Runnable {
 				ParaOndeMeVouMover = pos;
 			}
 		}
-
-		//BoardPosition ParaOndeMeVouMover = neighbors.get((int)(Math.random()*(neighbors.size())));
-
+		
 		Cell nova = super.getBoard().getCell(ParaOndeMeVouMover);
-
 		if(nova.isOccupied() && !nova.isOccupiedByGoal())
 			try {
 				wait();
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				System.err.println("Saí da espera ----------------------------------------");
+				return;
 			}
+		if(nova.isOccupiedByGoal())
+			nova.getGoal().captureGoal();
+		
 		currcell.request(this);
 		nova.request(this);
 		nova.setGameElement(this);
@@ -94,7 +96,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 
 		super.getBoard().setChanged();
 
-		System.out.println("Posição nova " + position + " do " + this.toString());
+		System.out.println("Posição nova " + position + " da Snake " + this.getIdentification());
 	}
 
 	public synchronized void wakeup() throws InterruptedException {
