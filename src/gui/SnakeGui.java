@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import environment.Board;
+import environment.Cell;
 import environment.LocalBoard;
 import game.AutomaticSnake;
 import game.Snake;
@@ -55,8 +56,15 @@ public class SnakeGui implements Observer {
 			public void actionPerformed(ActionEvent e) {
 				//Depois, implementar board.getCells() e percorrer todas a dizer "signalAll"
 				try {
-					for(Snake s : board.getSnakes())
-						((AutomaticSnake)s).wakeup();
+					for(Cell cell : board.allCells()) {
+						cell.lock.lock();
+						try {
+							cell.isEmpty.signal();
+						}
+						finally {
+							cell.lock.unlock();
+						}
+					}
 					System.out.println("Podem continuar");
 				} catch (Exception e2) {
 					System.err.println("Não há nenhuma Snake em espera!");

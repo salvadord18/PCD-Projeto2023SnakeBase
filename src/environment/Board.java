@@ -16,7 +16,7 @@ import game.Snake;
 public abstract class Board extends Observable {
 	public Cell[][] cells; //todas as células existentes no Board, por ordem.
 	private BoardPosition goalPosition; //posição atual do único Goal no Board.
-	public static final long PLAYER_PLAY_INTERVAL = 900; //?
+	public static final long PLAYER_PLAY_INTERVAL = 300; //?
 	public static final long OBSTACLE_MOVE_INTERVAL = 1000;
 	public static final long REMOTE_REFRESH_INTERVAL = 100; //not necessary
 	public static final int NUM_COLUMNS = 10; //Largura do Board
@@ -40,7 +40,7 @@ public abstract class Board extends Observable {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
 		for (int x = 0; x < NUM_COLUMNS; x++) {
 			for (int y = 0; y < NUM_ROWS; y++) {
-				cells[x][y] = new Cell(new BoardPosition(x, y));
+				cells[x][y] = new Cell(new BoardPosition(x, y), this);
 			}
 		}
 		//		Thread gameOver = new Thread() {
@@ -65,14 +65,15 @@ public abstract class Board extends Observable {
 		return cells[cellCoord.x][cellCoord.y];
 	}
 	
+	
 	public LinkedList<Cell> allCells() {
-		LinkedList<Cell> Allcells = new LinkedList<>();
+		LinkedList<Cell> allCells = new LinkedList<>();
 		for (int x = 0; x < NUM_COLUMNS; x++) {
 			for (int y = 0; y < NUM_ROWS; y++) {
-				Allcells.add(cells[x][y]);
+				allCells.add(cells[x][y]);
 			}
 		}
-		return Allcells;
+		return allCells;
 	}
 
 	//Devolve uma BoardPosition aleatória (para os Obstáculos e para o Goal) - protected?

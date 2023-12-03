@@ -34,9 +34,13 @@ public class Obstacle extends GameElement {
 	}
 
 	public void move() {
-		currentCell.removeGameElement();	
-		board.addGameElement(this);
-		remainingMoves--;
-		board.setChanged();
+		try {
+			currentCell.removeGameElement();
+			board.addGameElement(this);
+			remainingMoves--;
+			board.setChanged();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}	
 	}
 }

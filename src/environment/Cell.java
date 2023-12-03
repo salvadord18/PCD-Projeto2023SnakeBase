@@ -1,16 +1,9 @@
 package environment;
 
-import java.io.Serializable;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.sound.midi.SysexMessage;
-
-import game.GameElement;
-import game.Goal;
-import game.Obstacle;
-import game.Snake;
-import game.AutomaticSnake;
+import game.*;
 /** Main class for game representation. 
  * 
  * @author luismota
@@ -20,18 +13,22 @@ public class Cell {
 	private BoardPosition position;
 	private Snake occupyingSnake = null;
 	private GameElement gameElement = null;
-	private Lock lock;
+	public Lock lock = new ReentrantLock();
+	public Condition isEmpty  = lock.newCondition();
+	private Board board;
+
+
+	public Cell(BoardPosition position, Board board) {
+		this.position = position;
+		this.board = board;
+	}
+
 
 	//devolve o GameElement que está na Cell - PODE DEVOLVER NULL
 	public GameElement getGameElement() {
 		return gameElement;
 	}
 
-	public Cell(BoardPosition position) {
-		super();
-		this.position = position;
-		lock = new ReentrantLock();
-	}
 
 	//devolve a BoardPosition da Cell - MUITO ÚTIL
 	public BoardPosition getPosition() {
@@ -41,63 +38,102 @@ public class Cell {
 	//Invocado pela Snake, pede para entrar dentro da célula SE A CÉLULA JA NAO TIVER LÁ ALGUÉM ANTES 
 	public void request(Snake snake)
 			throws InterruptedException {
-		lock.lock();
+		//lock.lock();
 		//TODO coordination and mutual exclusion
 	}
 
 	//Invocado para libertar (célula.unlock()) a célula
 	public void release() {
-		lock.unlock();
+		//lock.unlock();
 		//TODO
 	}
 
 	//Boolean que diz se é snake o GameElement da célula
 	public boolean isOccupiedBySnake() {
-		return occupyingSnake != null;
+		if((gameElement != null && gameElement instanceof Snake) || occupyingSnake != null)
+			return true;
+		return false;
 	}
 
-	//Atribui o GameElement à célula - a ser usado sempre 
-	public synchronized void setGameElement(GameElement element) { //melhorar este método
-		// TODO coordination and mutual exclusion
-		while(isOccupied() && element instanceof Snake && !isOccupiedByGoal())
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void snakeMovesTo(Cell nextCell) {
+		lock.lock();
+		try {			
+			//2ª Possibilidade - Proxima celula estar ocupada por snake ou obstacle
+			while(nextCell.isOccupied() && !nextCell.isOccupiedByGoal()) {
+				System.out.println("awaitinggggggggggggggggggggggggggggggg");
+				isEmpty.await();
+				System.out.println("done awaittttttinggggggg");
 			}
-		if(!isOccupied()) {
-			notifyAll();
-			if(element instanceof Goal)
-				gameElement = element;
-			else if(element instanceof Snake && isOccupiedByGoal()) {
-				((Snake)element).setDesiredSize(getGoal().getValue());
-				gameElement = element;
-			}
-			else if(element instanceof Snake) {
-				occupyingSnake = (Snake)element;
-				gameElement = element;
-			}
-			if(element instanceof Obstacle && !isOccupiedByGoal())
-				gameElement = element;
-
+			//1ª Possibilidade - proxima celula estar livre ou ter um Goal
+			//if(!nextCell.isOccupied() || nextCell.isOccupiedByGoal()) {
+				nextCell.lock.lock();
+				try {
+					if(nextCell.isOccupiedByGoal()) {
+						getOccupyingSnake().setDesiredSize(nextCell.getGoal().getValue());
+						nextCell.getGoal().captureGoal();
+					}
+					System.out.println(getOccupyingSnake());
+					nextCell.setGameElement(getOccupyingSnake());
+					//nextCell.getOccupyingSnake().addCell(nextCell);
+					nextCell.getOccupyingSnake().getCells().getFirst().removeGameElement(); // dizer á celula q ja nao esta aliu nenhuma snake bro
+					nextCell.getOccupyingSnake().removeTailCell();
+				} finally {
+					nextCell.lock.unlock();
+				} 
+			//}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			lock.unlock();
 		}
+		board.setChanged();
+	}
+
+
+	//Atribui o GameElement à célula - a ser usado sempre 
+	public void setGameElement(GameElement element) { //melhorar este método
+		lock.lock();
+		try {
+			gameElement = element;
+			if(element instanceof Snake) {
+				occupyingSnake = (Snake)element;
+				occupyingSnake.addCell(this);
+			}
+		} finally {
+			lock.unlock();
+		} 
+		board.setChanged();
 	}
 
 	//Se está ocupada
 	public boolean isOccupied() {
-		return isOccupiedBySnake() || (gameElement != null && gameElement instanceof Obstacle);
+		return isOccupiedBySnake() || (gameElement != null);
 	}
 
 	//Que snake está na célula (PODE DEVOLVER NULL)
 	public Snake getOccupyingSnake() {
+		if(occupyingSnake == null)
+			return null; //desnecessário
 		return occupyingSnake;
 	}
 
-	public void removeGameElement() {
-		if(gameElement instanceof Snake)
-			occupyingSnake = null;
-		gameElement = null;
+	public void removeGameElement() throws InterruptedException {
+		lock.lock();
+		try {
+			if(gameElement instanceof Snake) {
+				//occupyingSnake.removeTailCell();
+				if(occupyingSnake.getSize() != occupyingSnake.getDesiredSize()) {
+					return;
+				}
+				occupyingSnake = null;
+			}
+			gameElement = null;
+			isEmpty.signal();// para todos os q estao a espera de se moverem para esta celula recebrem um alerta de q ficou free
+		System.out.println("sai da celula aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		} finally {
+			lock.unlock();
+		}
+		board.setChanged();
 	}
 
 
@@ -105,8 +141,12 @@ public class Cell {
 		return (Goal)gameElement;
 	}
 
+	public Obstacle getObstacle() {
+		return (Obstacle)gameElement;
+	}
+
 
 	public boolean isOccupiedByGoal() {
-		return (gameElement!=null && gameElement instanceof Goal);
+		return (gameElement != null && gameElement instanceof Goal);
 	}
 }

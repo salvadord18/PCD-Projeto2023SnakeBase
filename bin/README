@@ -8,9 +8,25 @@ Quando uma cobra sai de uma célula, faz SEMPRE signall()
 	1) erro quando o goal é gerado na primeira linha do board, ((0,9))
 	2) Quem é que deve verificar se alguma das snakes já chegou ao prémio máximo?
 		Deverá ser a propria snake? 
+		
+		
+		lock-- mal feitos , inicio ao fim
+		
+		nao ha coordenaçao nas threads, cobras n se conhecem
+		
+		coordenaçao ao nivel do objeto  (awaiT  ) feitos nos recursos partilhados  , feito na celula
 	
 
 -----------------------
 
 
 cobras paradas ha procura de uma celula onde estava um obstaculo devem ser retomadas assim q o obstaculo sair da mesma
+
+-------------BUGS 03/12-------------
+
+         - PROF:cobras paradas têm q continuar;
+         - cobras paradas têm q escolher nova alternativa;
+         - PROF:colocaçao inicial das snakes tem de estar na snake e na cell ( falta na snake);
+         - HumanSnake;
+         - Termino do jogo;
+         - Cliente e Servidor; 
