@@ -4,16 +4,15 @@ import environment.Board;
 import environment.Cell;
 import environment.LocalBoard;
 
-public class Obstacle extends GameElement implements Runnable  {
+public class Obstacle extends GameElement {
 	private static final int NUM_MOVES=3;
-	private static final int OBSTACLE_MOVE_INTERVAL = 400;
 	private int remainingMoves=NUM_MOVES;
+	public static int MOVE_INTERVAL = 500;
 	private Board board;
 	private Cell currentCell; //podemos colocar este atributo aqui?
 	private ObstacleMover om;
 
 	public Obstacle(Board board) {
-		super();
 		this.board = board;
 	}
 
@@ -34,9 +33,14 @@ public class Obstacle extends GameElement implements Runnable  {
 		return remainingMoves;
 	}
 
-	public void run() {
-		ObstacleMover om = new ObstacleMover(this,(LocalBoard) board);
-		this.om = om;
-		om.start();
+	public void move() {
+		try {
+			currentCell.removeGameElement();
+			board.addGameElement(this);
+			remainingMoves--;
+			board.setChanged();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}	
 	}
 }

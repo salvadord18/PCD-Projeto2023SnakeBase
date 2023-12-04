@@ -14,17 +14,19 @@ import game.Obstacle;
 import game.Snake;
 
 public abstract class Board extends Observable {
-	protected Cell[][] cells; //todas as células existentes no Board, por ordem.
+	public Cell[][] cells; //todas as células existentes no Board, por ordem.
 	private BoardPosition goalPosition; //posição atual do único Goal no Board.
-	public static final long PLAYER_PLAY_INTERVAL = 900; //?
+	public static final long PLAYER_PLAY_INTERVAL = 300; //?
+	public static final long OBSTACLE_MOVE_INTERVAL = 1000;
 	public static final long REMOTE_REFRESH_INTERVAL = 100; //not necessary
 	public static final int NUM_COLUMNS = 10; //Largura do Board
 	public static final int NUM_ROWS = 10; //Comprimento do Board
-	public static final int MAXPOINTS = 10; //Condicao de término do jogo
+	public static final int MAXPOINTS = 3; //Condicao de término do jogo
 	protected LinkedList<Snake> snakes = new LinkedList<Snake>(); //todas as Snakes no Board
 	private LinkedList<Obstacle> obstacles= new LinkedList<Obstacle>(); //todos os Obstáculos no Board
-	protected boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
+	public boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
 	private ExecutorService ex = Executors.newFixedThreadPool(3); //onde implementar?
+
 
 	/*
 	 * Cells - mover cobras, mover obstaculos, ...
@@ -38,14 +40,40 @@ public abstract class Board extends Observable {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
 		for (int x = 0; x < NUM_COLUMNS; x++) {
 			for (int y = 0; y < NUM_ROWS; y++) {
-				cells[x][y] = new Cell(new BoardPosition(x, y));
+				cells[x][y] = new Cell(new BoardPosition(x, y), this);
 			}
 		}
+		//		Thread gameOver = new Thread() {
+		//			@Override 
+		//			public void run() {
+		//				while(!isFinished) {
+		//					
+		//				}
+		//				// interrompe as threads que correm os jogadores
+		//				for(Obstacle o : obstacles){
+		//					o.getObstacleMover().stop();
+		//				}
+		//				//isFinished = true;
+		//				System.err.println("GAME FINISHED!");
+		//			};
+		//		};
+		//		gameOver.start();
 	}
 
 	//Devolve a célula que se encontra na Board Position cellCoord
 	public Cell getCell(BoardPosition cellCoord) {
 		return cells[cellCoord.x][cellCoord.y];
+	}
+	
+	
+	public LinkedList<Cell> allCells() {
+		LinkedList<Cell> allCells = new LinkedList<>();
+		for (int x = 0; x < NUM_COLUMNS; x++) {
+			for (int y = 0; y < NUM_ROWS; y++) {
+				allCells.add(cells[x][y]);
+			}
+		}
+		return allCells;
 	}
 
 	//Devolve uma BoardPosition aleatória (para os Obstáculos e para o Goal) - protected?
@@ -64,22 +92,23 @@ public abstract class Board extends Observable {
 	}
 
 	//Colocação inicial dos players & novos Goals
-	public void addGameElement(GameElement gameElement) {
+	public synchronized void addGameElement(GameElement gameElement) {
 		boolean placed=false;
 		while(!placed) {
 			BoardPosition pos=getRandomPosition();
-			if(!getCell(pos).isOccupied() && !getCell(pos).isOccupiedByGoal()) {
-				getCell(pos).setGameElement(gameElement);
+			if(!getCell(pos).isOccupied()) {
 				if(gameElement instanceof Goal) {
 					setGoalPosition(pos);
 					System.out.println("Goal placed at: " + pos + "! :D");
 				}
-				if(gameElement instanceof Obstacle) {
+				else if(gameElement instanceof Obstacle) {
 					((Obstacle)gameElement).setCurrentCell(getCell(pos));
 				}
+				getCell(pos).setGameElement(gameElement);
 				placed=true;
 			}
 		}
+		setChanged();
 	}
 
 	// Devolve uma lista das BoardPositions vizinhas - verifica APENAS se estão dentro do board
@@ -101,7 +130,7 @@ public abstract class Board extends Observable {
 
 	// função que cria o novo Goal sozinha! -> onde está o notifyChange()?
 	protected Goal addGoal() {
-		Goal goal=new Goal(this);
+		Goal goal = new Goal(this);
 		addGameElement(goal);
 		return goal;
 	}
@@ -116,9 +145,7 @@ public abstract class Board extends Observable {
 			getObstacles().add(obs);
 			numberObstacles--;
 		}
-		for(Obstacle o : getObstacles()) {
-			o.run();
-		}
+		setChanged();
 	}
 
 	// todas as snakes que existem no Board
@@ -152,5 +179,19 @@ public abstract class Board extends Observable {
 		snakes.add(snake);
 	}
 
-
+	public void finish() {
+		isFinished = true;
+	}
+	//	  public void endGame() {
+	//	        isFinished = true; // Sinaliza que o jogo terminou
+	//	        Thread endGameThread = new Thread(() -> {
+	//	            for (Snake snake : snakes) {
+	//	                snake.stopMoving(); // Método para interromper a movimentação da cobra
+	//	            }
+	//	            for (Obstacle obstacle : obstacles) {
+	//	                obstacle.getObstacleMover().interrupt(); // Sinaliza para interromper a movimentação dos obstáculos
+	//	            }
+	//	        });
+	//	        endGameThread.start();;
+	//	  }
 }

@@ -1,12 +1,7 @@
 package game;
 
-import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.text.Position;
-
 import environment.LocalBoard;
-import gui.SnakeGui;
 import environment.Cell;
 import environment.Board;
 import environment.BoardPosition;
@@ -21,7 +16,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 		doInitialPositioning();
 		System.err.println("initial size:" + cells.size());
 
-		while(super.size < Board.MAXPOINTS) {
+		while(true) { //mudar para !isFinished
 			try {
 				move();
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
@@ -33,6 +28,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 			//getrandomcell
 			//request that cell
 		}
+		//super.getBoard().finish();
 	}
 
 	public Thread SnakeThread () {
@@ -40,64 +36,71 @@ public class AutomaticSnake extends Snake implements Runnable {
 	}
 
 	public synchronized void move() throws InterruptedException {
-		Cell currcell = super.getCells().getLast(); // vai buscar a célula atual
+		Cell currcell = super.getCells().getLast(); // vai buscar a célula da cabeça atual
 		if(currcell == null) return;
-		BoardPosition position = currcell.getPosition(); // vai buscar a posição atual da célula
-		System.out.println("Posição atual " + position + " do " + this.toString());
+		BoardPosition position = currcell.getPosition(); // vai buscar a posição atual dessa célula
+		System.out.println("Posição atual " + position + " da Snake " + this.getIdentification());
 
-		List<BoardPosition> neighbors = super.getBoard().getNeighboringPositions(currcell);
+		Cell ParaOndeMeVouMover = choosingNewCell(currcell);
 
-		//		Iterator it = neighbors.iterator();
-		//		for (BoardPosition p : neighbors) {
-		//			if(this.equals(getBoard().getCell(p).getOcuppyingSnake())) {  // verifica se onde a snake quer ir está ocuapdo por ela mesma
-		//				it.remove(); //remove todas as células das "CELULAS POSSIVEIS DE SE MOVER PARA" nas quais eu ja esteja.
-		//			}
-		//			it.next();
-		//		}
+		currcell.snakeMovesTo(ParaOndeMeVouMover);
+
+		super.getBoard().setChanged();
+
+		System.out.println("Posição nova " + ParaOndeMeVouMover + " da Snake " + this.getIdentification());
+	}
+
+	public synchronized void wakeup() throws InterruptedException {
+		Thread.currentThread().interrupt();
+
+	}
+
+	public Cell choosingNewCell(Cell currcell) {
+		List<BoardPosition> neighboringPositions = super.getBoard().getNeighboringPositions(currcell);
 
 		//Lambda Expression ( :( ) que remove todas as posições que tenham como snake a própria
-		neighbors.removeIf(pos -> this.equals(getBoard().getCell(pos).getOccupyingSnake()));
+		neighboringPositions.removeIf(pos -> this.equals(getBoard().getCell(pos).getOccupyingSnake()));
+		if(neighboringPositions.isEmpty())
+			Thread.currentThread().stop(); 		//porquê stop? porque ela já não terá mesmo para onde se mover.
 
-		if(neighbors.isEmpty())
+		/* Escolher a célula mais perto do Goal de entre as vizinhas */
+		BoardPosition ParaOndeMeVouMover = null;
+		double min_distance = 9999.0; //random value e grande para a condiçao se manter verdadeira
+
+		for(BoardPosition pos : neighboringPositions) {
+			if(pos.distanceTo(super.getBoard().getGoalPosition()) < min_distance) {
+				min_distance = pos.distanceTo(super.getBoard().getGoalPosition());
+				ParaOndeMeVouMover = pos;
+			}
+		}
+		Cell nova = super.getBoard().getCell(ParaOndeMeVouMover);
+
+		return nova;
+	}
+
+	//mudar
+	public Cell choosingABetterCell(Cell currcell) {
+		List<BoardPosition> neighboringPositions = super.getBoard().getNeighboringPositions(currcell);
+
+		//Lambda Expression ( :( ) que remove todas as posições que tenham como snake a própria
+		neighboringPositions.removeIf(pos -> (this.equals(getBoard().getCell(pos).getOccupyingSnake()) || (getBoard().getCell(pos).isOccupied() && !getBoard().getCell(pos).isOccupiedByGoal())));
+		if(neighboringPositions.isEmpty())
 			Thread.currentThread().stop(); 		//porquê stop? porque ela já não terá mesmo para onde se mover.
 
 
-		/* linha que diferencia a AutomaticSnake da Human */
+		/* Escolher a célula mais perto do Goal de entre as vizinhas */
 		BoardPosition ParaOndeMeVouMover = null;
-		double min_distance = 9999.0; //random value
+		double min_distance = 9999.0; //random value e grande para a condiçao se manter verdadeira
 
-		for(BoardPosition pos : neighbors) {
+		for(BoardPosition pos : neighboringPositions) {
 			if(pos.distanceTo(super.getBoard().getGoalPosition()) < min_distance) {
 				min_distance = pos.distanceTo(super.getBoard().getGoalPosition());
 				ParaOndeMeVouMover = pos;
 			}
 		}
 
-		//BoardPosition ParaOndeMeVouMover = neighbors.get((int)(Math.random()*(neighbors.size())));
-
 		Cell nova = super.getBoard().getCell(ParaOndeMeVouMover);
-
-		if(nova.isOccupied() && !nova.isOccupiedByGoal())
-			try {
-				wait();
-			} catch (InterruptedException e) {
-				System.err.println("Saí da espera ----------------------------------------");
-			}
-		currcell.request(this);
-		nova.request(this);
-		nova.setGameElement(this);
-		addCell(nova);
-		super.removeCell();
-		currcell.release();
-		nova.release();
-
-		super.getBoard().setChanged();
-
-		System.out.println("Posição nova " + position + " do " + this.toString());
+		System.out.println(currcell + ", " + nova);
+		return nova;
 	}
-
-	public synchronized void wakeup() throws InterruptedException {
-		notifyAll();
-	}
-
 }
