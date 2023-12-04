@@ -71,6 +71,11 @@ public class Cell {
 					if(nextCell.isOccupiedByGoal()) {
 						getOccupyingSnake().setDesiredSize(nextCell.getGoal().getValue());
 						nextCell.getGoal().captureGoal();
+						if(nextCell.getGoal().getValue() == 10) {
+							getOccupyingSnake();
+							Snake.terminarJogo();
+							System.out.println("Fim do jogo!");
+						}
 					}
 					System.out.println(getOccupyingSnake());
 					nextCell.setGameElement(getOccupyingSnake());

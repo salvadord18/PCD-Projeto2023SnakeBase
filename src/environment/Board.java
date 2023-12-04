@@ -19,8 +19,8 @@ public abstract class Board extends Observable {
 	public static final long PLAYER_PLAY_INTERVAL = 300; //?
 	public static final long OBSTACLE_MOVE_INTERVAL = 1000;
 	public static final long REMOTE_REFRESH_INTERVAL = 100; //not necessary
-	public static final int NUM_COLUMNS = 10; //Largura do Board
-	public static final int NUM_ROWS = 10; //Comprimento do Board
+	public static final int NUM_COLUMNS = 30; //Largura do Board
+	public static final int NUM_ROWS = 30; //Comprimento do Board
 	public static final int MAXPOINTS = 3; //Condicao de término do jogo
 	protected LinkedList<Snake> snakes = new LinkedList<Snake>(); //todas as Snakes no Board
 	private LinkedList<Obstacle> obstacles= new LinkedList<Obstacle>(); //todos os Obstáculos no Board

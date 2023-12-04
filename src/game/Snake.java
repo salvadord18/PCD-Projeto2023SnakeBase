@@ -23,6 +23,7 @@ public abstract class Snake extends GameElement implements Serializable{
 	//	private volatile boolean isMoving = true; // Flag para controlar o movimento
 
 	//private static int MAX_VALUE = 10
+	protected static boolean jogoTerminado = false;
 
 	public Snake(int id,Board board) {
 		this.id = id;
@@ -128,7 +129,7 @@ public abstract class Snake extends GameElement implements Serializable{
 		//        while (isMoving) {
 		//            try {
 		//                move();
-		//                // Aqui você pode ter um sleep ou algum controle de tempo
+		//                // Aqui pode ter um sleep ou algum controlo de tempo
 		//                // Thread.sleep(tempo);
 		//            } catch (InterruptedException e) {
 		//                // Tratamento de exceção ou re-interrupção da thread
@@ -136,5 +137,14 @@ public abstract class Snake extends GameElement implements Serializable{
 		//            }
 		//        }
 		//    }
+
+		
+		public synchronized static void terminarJogo() {
+		    jogoTerminado = true;
+		}
+
+		public synchronized static boolean jogoTerminado() {
+		    return jogoTerminado;
+		}
 
 	}

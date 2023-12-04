@@ -16,7 +16,7 @@ public class AutomaticSnake extends Snake implements Runnable {
 		doInitialPositioning();
 		System.err.println("initial size:" + cells.size());
 
-		while(true) { //mudar para !isFinished
+		while(!jogoTerminado) { //mudar para !isFinished
 			try {
 				move();
 				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
