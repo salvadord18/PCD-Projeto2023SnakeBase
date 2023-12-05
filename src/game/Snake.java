@@ -143,7 +143,7 @@ public abstract class Snake extends GameElement implements Serializable{
 		    jogoTerminado = true;
 		}
 
-		public synchronized static boolean jogoTerminado() {
+		public synchronized static boolean isjogoTerminado() {
 		    return jogoTerminado;
 		}
 

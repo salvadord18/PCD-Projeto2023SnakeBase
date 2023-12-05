@@ -54,7 +54,7 @@ public class ObstacleMover extends Thread {
 	//    }
 	@Override
 	public void run() {
-		while(obstacle.getRemainingMoves() > 0) {
+		while(obstacle.getRemainingMoves() > 0 && !Snake.isjogoTerminado()) {
 			obstacle.move();
 			try {
 				sleep(Obstacle.MOVE_INTERVAL);
