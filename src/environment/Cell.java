@@ -34,6 +34,10 @@ public class Cell {
 	public BoardPosition getPosition() {
 		return position;
 	}
+	
+	public void setPosition(BoardPosition newPosition) {
+		this.position = newPosition;
+	}
 
 	//Invocado pela Snake, pede para entrar dentro da célula SE A CÉLULA JA NAO TIVER LÁ ALGUÉM ANTES 
 	public void request(Snake snake)

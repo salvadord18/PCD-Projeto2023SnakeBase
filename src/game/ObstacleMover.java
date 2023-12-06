@@ -9,15 +9,23 @@ import java.util.concurrent.Executors;
 import environment.BoardPosition;
 import environment.Cell;
 import environment.LocalBoard;
+import remote.RemoteBoard;
 
 public class ObstacleMover extends Thread {
 	private Obstacle obstacle;
 	private LocalBoard board;
+	private RemoteBoard remoteBoard;
 
 	public ObstacleMover(Obstacle obstacle, LocalBoard board) {
 		super();
 		this.obstacle = obstacle;
 		this.board = board;
+	}
+	
+	public ObstacleMover(Obstacle obstacle, RemoteBoard remoteBoard) {
+		super();
+		this.obstacle = obstacle;
+		this.remoteBoard = remoteBoard;
 	}
 
 	//    @Override
