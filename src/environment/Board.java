@@ -1,15 +1,12 @@
 package environment;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import game.GameElement;
 import game.Goal;
+import game.HumanSnake;
 import game.Obstacle;
 import game.Snake;
 
@@ -25,16 +22,7 @@ public abstract class Board extends Observable {
 	protected LinkedList<Snake> snakes = new LinkedList<Snake>(); //todas as Snakes no Board
 	private LinkedList<Obstacle> obstacles= new LinkedList<Obstacle>(); //todos os Obstáculos no Board
 	public boolean isFinished; //Boolean para definir se nenhuma cobra ganhou (ainda)
-	private ExecutorService ex = Executors.newFixedThreadPool(3); //onde implementar?
-
-
-	/*
-	 * Cells - mover cobras, mover obstaculos, ...
-	 * goalPosition - movimentação das cobras automáticas 
-	 * NUM_Columns & NUM_Rows para saber se as movimentações são para dentro do Board - delimitar
-	 * Snakes - 
-	 * Obstacles -
-	 * */
+	public int lastPressedDirection = 0;
 
 	public Board() {
 		cells = new Cell[NUM_COLUMNS][NUM_ROWS];
@@ -64,8 +52,8 @@ public abstract class Board extends Observable {
 	public Cell getCell(BoardPosition cellCoord) {
 		return cells[cellCoord.x][cellCoord.y];
 	}
-	
-	
+
+
 	public LinkedList<Cell> allCells() {
 		LinkedList<Cell> allCells = new LinkedList<>();
 		for (int x = 0; x < NUM_COLUMNS; x++) {
@@ -127,6 +115,12 @@ public abstract class Board extends Observable {
 		return possibleCells;
 	}
 
+	public boolean isViablePosition(BoardPosition pos) {
+		if(pos.x >= 0 && pos.x <= NUM_COLUMNS-1 && pos.y >= 0 && pos.y <= NUM_ROWS-1)
+			return true;
+		return false;
+	}
+
 
 	// função que cria o novo Goal sozinha! -> onde está o notifyChange()?
 	protected Goal addGoal() {
@@ -168,9 +162,22 @@ public abstract class Board extends Observable {
 
 	public abstract void init(); 
 
-	public abstract void handleKeyPress(int keyCode);
+	public void handleKeyPress(int keyCode) {
+		lastPressedDirection = keyCode;
+		if(lastPressedDirection != 0)
+			System.out.println("Keycode: " + keyCode);
+		for(Snake s : snakes) {
+			if(s instanceof HumanSnake) {
+				((HumanSnake)s).move(lastPressedDirection);
+				return;
+			}
+		}
 
-	public abstract void handleKeyRelease();
+	}
+
+	public void handleKeyRelease() {
+		lastPressedDirection = 0;
+	}
 
 
 

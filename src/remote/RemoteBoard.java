@@ -1,6 +1,7 @@
 package remote;
 
 import java.io.IOException;
+import java.awt.event.KeyEvent;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import environment.Board;
 import environment.BoardPosition;
 import environment.Cell;
 import game.Goal;
+import game.HumanSnake;
 import game.Obstacle;
 import game.Snake;
 
@@ -19,24 +21,16 @@ import game.Snake;
  * @author luismota
  *
  */
-public class RemoteBoard extends Board{
+public class RemoteBoard extends Board {
+	//private PrintWriter ...;
+	private Client client;
 	
-	@Override
-	public void handleKeyPress(int keyCode) {
-		//TODO
+	public RemoteBoard() {
+		super();
 	}
-
-	@Override
-	public void handleKeyRelease() {
-		// TODO
-	}
-
+	
 	@Override
 	public void init() {
-		// TODO 		
+		
 	}
-
-
-	
-
 }

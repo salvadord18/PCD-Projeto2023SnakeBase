@@ -1,7 +1,6 @@
 package game;
 
 import environment.Board;
-import environment.LocalBoard;
 
 public class Goal extends GameElement {
 	private int value = 1;
@@ -25,8 +24,12 @@ public class Goal extends GameElement {
 
 	//... ou então fazemos o goal "que morre" e um novo é adicionado
 	public synchronized void captureGoal() {
+		if(value == MAX_VALUE-1) {
+			board.finish();
+			return;
+		}
 		board.addGameElement(this);   
-		incrementValue();
+		incrementValue();	
 		board.setChanged();
 	}
 }

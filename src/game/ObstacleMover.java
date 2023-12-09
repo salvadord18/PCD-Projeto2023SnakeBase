@@ -54,7 +54,7 @@ public class ObstacleMover extends Thread {
 	//    }
 	@Override
 	public void run() {
-		while(obstacle.getRemainingMoves() > 0) {
+		while(obstacle.getRemainingMoves() > 0 && !board.isFinished) {
 			obstacle.move();
 			try {
 				sleep(Obstacle.MOVE_INTERVAL);

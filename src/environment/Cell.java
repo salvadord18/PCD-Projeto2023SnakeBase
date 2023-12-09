@@ -59,10 +59,13 @@ public class Cell {
 		lock.lock();
 		try {			
 			//2ª Possibilidade - Proxima celula estar ocupada por snake ou obstacle
-			while(nextCell.isOccupied() && !nextCell.isOccupiedByGoal()) {
+			while(nextCell.isOccupied() && !nextCell.isOccupiedByGoal() && occupyingSnake instanceof AutomaticSnake) {
 				System.out.println("awaitinggggggggggggggggggggggggggggggg");
 				isEmpty.await();
 				System.out.println("done awaittttttinggggggg");
+				((AutomaticSnake)occupyingSnake).choosingABetterCell(this);
+				return;
+
 			}
 			//1ª Possibilidade - proxima celula estar livre ou ter um Goal
 			//if(!nextCell.isOccupied() || nextCell.isOccupiedByGoal()) {
@@ -72,7 +75,7 @@ public class Cell {
 						getOccupyingSnake().setDesiredSize(nextCell.getGoal().getValue());
 						nextCell.getGoal().captureGoal();
 					}
-					System.out.println(getOccupyingSnake());
+					System.out.println(getOccupyingSnake().toString());
 					nextCell.setGameElement(getOccupyingSnake());
 					//nextCell.getOccupyingSnake().addCell(nextCell);
 					nextCell.getOccupyingSnake().getCells().getFirst().removeGameElement(); // dizer á celula q ja nao esta aliu nenhuma snake bro
