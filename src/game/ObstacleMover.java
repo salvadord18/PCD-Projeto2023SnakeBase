@@ -9,23 +9,15 @@ import java.util.concurrent.Executors;
 import environment.BoardPosition;
 import environment.Cell;
 import environment.LocalBoard;
-import remote.RemoteBoard;
 
 public class ObstacleMover extends Thread {
 	private Obstacle obstacle;
 	private LocalBoard board;
-	private RemoteBoard remoteBoard;
 
 	public ObstacleMover(Obstacle obstacle, LocalBoard board) {
 		super();
 		this.obstacle = obstacle;
 		this.board = board;
-	}
-	
-	public ObstacleMover(Obstacle obstacle, RemoteBoard remoteBoard) {
-		super();
-		this.obstacle = obstacle;
-		this.remoteBoard = remoteBoard;
 	}
 
 	//    @Override
@@ -62,7 +54,7 @@ public class ObstacleMover extends Thread {
 	//    }
 	@Override
 	public void run() {
-		while(obstacle.getRemainingMoves() > 0 && !Snake.isjogoTerminado()) {
+		while(obstacle.getRemainingMoves() > 0 && !board.isFinished) {
 			obstacle.move();
 			try {
 				sleep(Obstacle.MOVE_INTERVAL);

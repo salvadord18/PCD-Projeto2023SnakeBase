@@ -8,7 +8,6 @@ import game.Goal;
 import game.HumanSnake;
 import game.Obstacle;
 import game.Snake;
-import game.AutomaticSnake;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -27,6 +26,7 @@ import javax.swing.JComponent;
  */
 public class BoardComponent extends JComponent implements KeyListener{
 
+	private static final long serialVersionUID = 1L;
 	private Board board;
 	private Image obstacleImage;
 
@@ -38,6 +38,7 @@ public class BoardComponent extends JComponent implements KeyListener{
 		addKeyListener(this);
 	}
 
+	//precisa da matriz das células e da lista de snakes do board. e o estado isFinished. Podemos enviar o board todo ou só uma mensagem com as celula+snakes
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -77,9 +78,7 @@ public class BoardComponent extends JComponent implements KeyListener{
 					g.fillRect((int)Math.round(cell.getPosition().x* CELL_WIDTH), 
 							(int)Math.round(cell.getPosition().y * CELL_WIDTH),
 							(int)Math.round(CELL_WIDTH), (int)Math.round(CELL_WIDTH));
-
 				}
-
 				// }
 			}
 			g.setColor(Color.BLACK);
@@ -130,6 +129,15 @@ public class BoardComponent extends JComponent implements KeyListener{
 
 		System.out.println("Got key released.");
 		board.handleKeyRelease();
+	}
+
+
+	public int getLastPressedDirection() {
+		return board.lastPressedDirection;
+	}
+
+	public void clearLastPressedDirection() {
+		board.lastPressedDirection = 0;
 	}
 
 	@Override

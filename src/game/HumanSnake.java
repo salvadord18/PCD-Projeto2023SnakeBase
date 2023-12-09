@@ -1,85 +1,61 @@
 package game;
 
 import environment.Board;
+import java.awt.event.KeyEvent;
 import environment.BoardPosition;
 import environment.Cell;
-import environment.Direction;
-
 /** Class for a remote snake, controlled by a human 
  * 
  * @author luismota
  *
  */
-public class HumanSnake extends Snake implements Runnable {
+public class HumanSnake extends Snake {
 
-	public Direction currentDirection;
-	
+	private static final long serialVersionUID = 1L;
+
 	public HumanSnake(int id,Board board) {
 		super(id,board);
+		super.doInitialPositioning();
 	}
 
-	@Override
-	public void run() {
-		doInitialPositioning();
-		System.err.println("initial size:" + cells.size());
-
-		while(!jogoTerminado) { //mudar para !isFinished
-			try {
-				move();
-				Thread.sleep(Board.PLAYER_PLAY_INTERVAL);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public void move(int keyCode) {
+		if(!getBoard().isFinished) {
+			Cell currcell = super.getCells().getLast(); /* vai buscar a celula atual */
+			
+			BoardPosition newPos = null;
+			switch (keyCode) {
+			case KeyEvent.VK_LEFT:
+				newPos = currcell.getPosition().getCellLeft();
+				break;
+			case KeyEvent.VK_RIGHT:
+				newPos = currcell.getPosition().getCellRight();
+				break;
+			case KeyEvent.VK_UP:
+				newPos = currcell.getPosition().getCellAbove();
+				break;
+			case KeyEvent.VK_DOWN:
+				newPos = currcell.getPosition().getCellBelow();
+				break;
+			default:
+				System.err.println("Key event errado!");
+				return;
 			}
+			
+			System.out.println("Posição: " + newPos.toString());
+			if(!super.getBoard().isViablePosition(newPos))
+				return;
 
+			Cell nova = super.getBoard().getCell(newPos);
+
+			if(nova.isOccupied() && !nova.isOccupiedByGoal())
+				return;
+
+			currcell.snakeMovesTo(nova);
+
+			getBoard().setChanged();
+
+			System.out.println("Posição nova " + nova.toString() + " da Snake " + this.getIdentification());
 		}
 	}
-	
-	public Thread SnakeThread () {
-		return Thread.currentThread();
-	}
-	
-	public synchronized void move() throws InterruptedException {
-		Cell currcell = super.getCells().getLast(); // vai buscar a célula da cabeça atual
-		if(currcell == null) return;
-		BoardPosition currentPosition = currcell.getPosition(); // vai buscar a posição atual dessa célula
-		System.out.println("Posição atual " + currentPosition + " da Snake " + this.getIdentification());
 
-        BoardPosition newPosition;
-		
-		switch (currentDirection) {
-        case UP:
-            newPosition = currentPosition.getCellAbove();
-            break;
-        case DOWN:
-            newPosition = currentPosition.getCellBelow();
-            break;
-        case LEFT:
-            newPosition = currentPosition.getCellLeft();
-            break;
-        case RIGHT:
-            newPosition = currentPosition.getCellRight();
-            break;
-        default:
-            // Trata um caso padrão ou erro
-            newPosition = currentPosition;
-    }
-
-		Cell ParaOndeMeVouMover = null;
-		ParaOndeMeVouMover.setPosition(newPosition);
-		currcell.snakeMovesTo(ParaOndeMeVouMover);
-
-		super.getBoard().setChanged();
-
-		System.out.println("Posição nova " + ParaOndeMeVouMover + " da Snake " + this.getIdentification());
-	}
-
-	public synchronized void wakeup() throws InterruptedException {
-		Thread.currentThread().interrupt();
-
-	}
-	
-	public void changeDirection(Direction newDirection) {
-        this.currentDirection = newDirection;
-    }
 }

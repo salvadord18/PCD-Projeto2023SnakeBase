@@ -27,6 +27,11 @@ cobras paradas ha procura de uma celula onde estava um obstaculo devem ser retom
          - PROF:cobras paradas têm q continuar;
          - cobras paradas têm q escolher nova alternativa;
          - PROF:colocaçao inicial das snakes tem de estar na snake e na cell ( falta na snake);
-         - HumanSnake;
-         - Termino do jogo;
-         - Cliente e Servidor; 
+         - HumanSnake; 4a
+         - Termino do jogo; 4a
+         - Cliente e Servidor; 4a
+         - termino do jogo tbm para obs??? 
+         
+         era fixe q aparecesse uma mensagem na consola a dizer q o jogo acabou
+         
+         

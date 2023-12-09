@@ -119,6 +119,9 @@ public abstract class Snake extends GameElement implements Serializable{
 		public Board getBoard() {
 			return board;
 		}
+		
+		
+		
 		// Método para parar a movimentação da cobra
 		//    public void stopMoving() {
 		//        isMoving = false;
